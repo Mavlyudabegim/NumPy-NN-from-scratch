@@ -1,3 +1,19 @@
-venv/
-.vscode
+# Python
 __pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Jupyter (if you ever explore in a notebook)
+.ipynb_checkpoints/
