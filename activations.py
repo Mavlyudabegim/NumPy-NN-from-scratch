@@ -31,9 +31,3 @@ def softmax(x):
     x = x - np.max(x, axis=-1, keepdims=True)
     exp_x = np.exp(x)
     return exp_x / np.sum(exp_x, axis=-1, keepdims=True)
-
-
-# Note: softmax's derivative is a full Jacobian per sample, which is awkward
-# to use directly. In practice, when softmax feeds into cross-entropy loss,
-# the combined gradient simplifies to (predictions - one_hot_labels) -- see
-# losses.py. You will not need a standalone softmax_derivative for this project.
