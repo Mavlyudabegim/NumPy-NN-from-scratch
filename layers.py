@@ -11,17 +11,11 @@ import numpy as np
 
 class Dense:
     def __init__(self, input_dim, output_dim):
-        # Small random init (e.g. scaled by sqrt(1/input_dim)) avoids
-        # saturating activations at the start of training. Try a couple of
-        # init scales later and see how it affects convergence -- that's a
-        # good thing to mention in your README write-up.
         self.W = np.random.randn(input_dim, output_dim) * np.sqrt(1.0 / input_dim)
         self.b = np.zeros((1, output_dim))
 
-        # Cache for use in the backward pass
         self.x = None
 
-        # Populated by backward()
         self.dW = None
         self.db = None
 
@@ -37,15 +31,6 @@ class Dense:
         """
         dL_dy: (batch_size, output_dim) -- upstream gradient (dL/d[this layer's output])
 
-        TODO:
-          1. self.dW = self.x.T @ dL_dy
-          2. self.db = np.sum(dL_dy, axis=0, keepdims=True)
-          3. dL_dx = dL_dy @ self.W.T
-          4. return dL_dx  -- this becomes the upstream gradient for the layer below
-
-        Double check shapes as you go: self.dW must be the same shape as
-        self.W, self.db the same shape as self.b, and dL_dx the same shape
-        as self.x. Shape mismatches are the #1 source of bugs here.
         """
 
         self.dW = self.x.T @ dL_dy

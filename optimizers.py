@@ -16,15 +16,9 @@ class SGD:
         """
         params_and_grads: list of (param, grad) tuples, e.g. [(W1, dW1), (b1, db1), ...]
 
-        TODO: for each (param, grad) pair, update in place:
-          param -= self.lr * grad
-
-        Careful: params are numpy arrays passed by reference. Use
-        `param -= ...` (in-place) not `param = param - ...` (rebinds the
-        local variable, doesn't affect the caller's array).
         """
-        raise NotImplementedError
-
+        for param, grad in params_and_grads:
+            param -= self.lr * grad
 
 class SGDMomentum:
     def __init__(self, lr=0.1, beta=0.9):
@@ -33,20 +27,13 @@ class SGDMomentum:
         self.velocities = None  # lazily initialized on first step() call
 
     def step(self, params_and_grads):
-        """
-        TODO:
-          1. On the first call, initialize self.velocities as a list of
-             zero arrays matching each param's shape.
-          2. For each (param, grad), with matching velocity v:
-               v[:] = self.beta * v + grad
-               param -= self.lr * v
+        if self.velocities is None:
+            self.velocities = [np.zeros_like(param) for param, grad in params_and_grads]
 
-        Compare against plain SGD once implemented: momentum should reach
-        a low loss in fewer epochs on this dataset, and you should be able
-        to explain why (accumulating gradient direction across steps,
-        damping oscillation in narrow ravines of the loss surface).
-        """
-        raise NotImplementedError
+        for i, (param, grad) in enumerate(params_and_grads):
+            v = self.velocities[i]
+            v[:] = self.beta * v + grad
+            param -= self.lr * v
 
 
 class Adam:
@@ -60,20 +47,12 @@ class Adam:
         self.t = 0     # timestep, needed for bias correction
 
     def step(self, params_and_grads):
-        """
-        TODO:
-          1. On first call, initialize self.m and self.v as lists of zero
-             arrays matching each param's shape.
-          2. self.t += 1
-          3. For each (param, grad), with matching m_i, v_i:
-               m_i[:] = self.beta1 * m_i + (1 - self.beta1) * grad
-               v_i[:] = self.beta2 * v_i + (1 - self.beta2) * (grad ** 2)
-               m_hat = m_i / (1 - self.beta1 ** self.t)
-               v_hat = v_i / (1 - self.beta2 ** self.t)
-               param -= self.lr * m_hat / (np.sqrt(v_hat) + self.eps)
-
-        Be ready to explain bias correction: without it, m and v are
-        biased toward zero during the first few steps (since they start
-        at zero), so dividing by (1 - beta^t) corrects for that.
-        """
-        raise NotImplementedError
+        self.m = self.m or [np.zeros_like(param) for param, grad in params_and_grads]
+        self.v = self.v or [np.zeros_like(param) for param, grad in params_and_grads]
+        self.t += 1
+        for i, (param, grad) in enumerate(params_and_grads):
+            self.m[i] = self.beta1 * self.m[i] + (1 - self.beta1) * grad
+            self.v[i] = self.beta2 * self.v[i] + (1 - self.beta2) * (grad ** 2)
+            m_hat = self.m[i] / (1 - self.beta1 ** self.t)
+            v_hat = self.v[i] / (1 - self.beta2 ** self.t)
+            param -= self.lr * m_hat / (np.sqrt(v_hat) + self.eps)

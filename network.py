@@ -65,17 +65,14 @@ class NeuralNetwork:
             grad = self.layers[i].backward(grad)
 
     def loss(self, x, labels_one_hot):
-        """Already implemented -- convenience wrapper for training/eval."""
         probs = self.forward(x)
         return cross_entropy_loss(probs, labels_one_hot)
 
     def predict(self, x):
-        """Already implemented -- returns predicted class indices."""
         probs = self.forward(x)
         return np.argmax(probs, axis=1)
 
     def all_params_and_grads(self):
-        """Already implemented -- flattens params/grads across all layers."""
         out = []
         for layer in self.layers:
             out.extend(layer.params_and_grads())
